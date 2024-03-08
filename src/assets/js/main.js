@@ -1,44 +1,55 @@
-/*=============== SHOW MENU ===============*/
-const navMenu = document.getElementById('nav-menu'),
-      navToggle = document.getElementById('nav-toggle'),
-      navClose = document.getElementById('nav-close')
+const storedTheme = localStorage.getItem('theme')
+ 
+const getPreferredTheme = () => {
+    if (storedTheme) {
+        return storedTheme
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
 
-/* Menu show */
-navToggle.addEventListener('click', () =>{
-   navMenu.classList.add('show-menu')
-})
+const setTheme = function (theme) {
+    if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-bs-theme', 'dark')
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', theme)
+    }
+}
 
-/* Menu hidden */
-navClose.addEventListener('click', () =>{
-   navMenu.classList.remove('show-menu')
-})
+setTheme(getPreferredTheme())
 
-/*=============== SEARCH ===============*/
-const search = document.getElementById('search'),
-      searchBtn = document.getElementById('search-btn'),
-      searchClose = document.getElementById('search-close')
+window.addEventListener('DOMContentLoaded', () => {
+    var el = document.querySelector('.theme-icon-active');
+    if(el != 'undefined' && el != null) {
+        const showActiveTheme = theme => {
+        const activeThemeIcon = document.querySelector('.theme-icon-active use')
+        const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+        const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
 
-/* Search show */
-searchBtn.addEventListener('click', () =>{
-   search.classList.add('show-search')
-})
+        document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+            element.classList.remove('active')
+        })
 
-/* Search hidden */
-searchClose.addEventListener('click', () =>{
-   search.classList.remove('show-search')
-})
+        btnToActive.classList.add('active')
+        activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+    }
 
-/*=============== LOGIN ===============*/
-const login = document.getElementById('login'),
-      loginBtn = document.getElementById('login-btn'),
-      loginClose = document.getElementById('login-close')
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (storedTheme !== 'light' || storedTheme !== 'dark') {
+            setTheme(getPreferredTheme())
+        }
+    })
 
-/* Login show */
-loginBtn.addEventListener('click', () =>{
-   login.classList.add('show-login')
-})
+    showActiveTheme(getPreferredTheme())
 
-/* Login hidden */
-loginClose.addEventListener('click', () =>{
-   login.classList.remove('show-login')
+    document.querySelectorAll('[data-bs-theme-value]')
+        .forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const theme = toggle.getAttribute('data-bs-theme-value')
+                localStorage.setItem('theme', theme)
+                setTheme(theme)
+                showActiveTheme(theme)
+            })
+        })
+
+    }
 })
